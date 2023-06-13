@@ -2,12 +2,14 @@ import cv2 as video_player
 
 # Leitor do arquivo contendo as direções da música
 # em um dispositivo
-txt = 'txt.txt'
-a = open(txt, "rt", encoding='utf8')
+fileloc = 'file_loc.txt'
+a = open(fileloc, "rt", encoding='utf8')
 lista_musicas = a.read()
 lista_musicas = lista_musicas.split('\n')
+a.close()
 print(lista_musicas)
 musicas_escolhidas = []
+
 
 # Função 1: Sensor de presença
 # O sensor de presença é ativado pela função sensor_presenca(),
@@ -41,7 +43,7 @@ def reiniciar(cap):
 # Ela imprime a mensagem "Apresentação de vídeo encerrada"
 # e chama o método destroyAllWindows() do objeto video_player para interromper a reprodução do vídeo.
 def encerrar():
-    print("Apresentação de vídeo encerrada.")
+    print("Apresentação de vídeo encerrada manualmente.")
     video_player.destroyAllWindows()
 
 # A função seletor_de_musicas(lista_musicas, musicas_escolhidas)
@@ -59,6 +61,7 @@ def seletor_de_musicas(lista_musicas, musicas_escolhidas):
             while True:
                 try:
                     musica = int(input(f'Digite a {cont} música escolhida: '))
+                    
                     musica -= 1
 
                     if musica < 0 or musica >= len(lista_musicas):
@@ -114,4 +117,4 @@ while True:
 
         break
 
-encerrar()
+print('Apresentação de vídeo encerrada')
