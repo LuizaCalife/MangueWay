@@ -2,13 +2,11 @@ import cv2 as video_player
 
 # Leitor do arquivo contendo as direções da música
 # em um dispositivo
-
-arquivo = open('txt.txt', "wt+")
-
-a = open(arquivo, "rt", encoding='utf8')
+txt = 'txt.txt'
+a = open(txt, "rt", encoding='utf8')
 lista_musicas = a.read()
 lista_musicas = lista_musicas.split('\n')
-
+print(lista_musicas)
 musicas_escolhidas = []
 
 # Função 1: Sensor de presença
@@ -19,40 +17,32 @@ def sensor_presenca():
     print("Sensor de presença ativado")
     return True
 
-# Função 2: Pause
-# A função pause() pausa a apresentação do vídeo. 
+# Função 2: Pause e Continuar
+# A função pausar_e_continuar() pausa a apresentação do vídeo. 
 # Ela imprime a mensagem "Apresentação de vídeo pausada"
-# e chama o método pause() do objeto video_player para pausar a reprodução do vídeo.
-def pause():
+# e chama o método pausar_e_continuar() do objeto video_player para pausar a reprodução do vídeo.
+def pausar_e_continuar():
     print("Apresentação de vídeo pausada.")
-    video_player.pause()
+    while True:
+        key = video_player.waitKey(1) & 0xFF
+        if key == ord('p'):
+            break
 
-# Função 3: Continuar
-# A função continuar() retoma a apresentação do vídeo após uma pausa.
-# Ela imprime a mensagem "Apresentação de vídeo retomada"
-# e chama o método play() do objeto 
-def continuar():
-    print("Apresentação de vídeo retomada.")
-    video_player.play()
-
-# Função 4: Reiniciar
-# A função reiniciar() reinicia a apresentação do vídeo. 
+# Função 3: Reiniciar
+# A função reiniciar(cap) reinicia a apresentação do vídeo. 
 # Ela imprime a mensagem "Apresentação de vídeo reiniciada"
-# e chama o método seek(0) do objeto video_player para reiniciar o vídeo a partir do início.
-def reiniciar():
+# e chama o método set(video_player.CAP_PROP_POS_FRAMES, 0) do objeto video_player para reiniciar o vídeo a partir do início.
+def reiniciar(cap):
     print("Apresentação de vídeo reiniciada.")
-    video_player.seek(0)
-def reiniciar():
-    print("Apresentação de vídeo reiniciada.")
-    video_player.seek(0)
+    cap.set(video_player.CAP_PROP_POS_FRAMES, 0)
 
-# Função 5: Encerrar
+# Função 4: Encerrar
 # A função encerrar() encerra a apresentação do vídeo.
 # Ela imprime a mensagem "Apresentação de vídeo encerrada"
-# e chama o método pause() do objeto video_player para interromper a reprodução do vídeo.
+# e chama o método destroyAllWindows() do objeto video_player para interromper a reprodução do vídeo.
 def encerrar():
     print("Apresentação de vídeo encerrada.")
-    video_player.pause()
+    video_player.destroyAllWindows()
 
 # A função seletor_de_musicas(lista_musicas, musicas_escolhidas)
 # permite que o usuário escolha até três músicas da lista lista_musicas.
@@ -84,9 +74,10 @@ def seletor_de_musicas(lista_musicas, musicas_escolhidas):
 
     return musicas_escolhidas
 
-# 
+# Função para reprodução do vídeo com uso do módulo cv2
 def reproduzir_video(caminho_arquivo):
     cap = video_player.VideoCapture(caminho_arquivo)
+    encerrar_video = False
 
     while True:
         ret, frame = cap.read()
@@ -96,19 +87,31 @@ def reproduzir_video(caminho_arquivo):
 
         video_player.imshow('Reprodução de Vídeo', frame)
 
-        if video_player.waitKey(1) & 0xFF == ord('q'):
+        key = video_player.waitKey(1) & 0xFF
+        if key == ord('p'):
+            pausar_e_continuar()
+        elif key == ord('r'):
+            reiniciar(cap)
+        elif key == ord('q'):
+            encerrar_video = True
             break
 
     cap.release()
     video_player.destroyAllWindows()
 
+    if encerrar_video:
+        encerrar()
+
 # Exemplo de uso:
 while True:
-    # Se o sensor de presença for ativado vai rodar as outras funções
-    if (sensor_presenca()):
-        # Primeiro a escolha das músicas
+    # Se o sensor de presença for ativado, vai rodar as outras funções
+    if sensor_presenca():
+        # Primeiro a escolha das músicas 
         file = seletor_de_musicas(lista_musicas, musicas_escolhidas)
-        # Vai rodar o vídeo em sequencia de escolha
-        print(file)
+        # Vai rodar o vídeo em sequência de escolha
         for item in file:
             reproduzir_video(item)
+
+        break
+
+encerrar()
